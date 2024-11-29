@@ -6,17 +6,13 @@ id = int(input("Choose an ID: "))
 host = '10.1.1.51'
 port = 12345
 
-screenWidth = 1920
-screenHeight = 1080
-screen = pygame.display.set_mode([screenWidth, screenHeight])
-clock = pygame.time.Clock()
 squarePositions = {
-    
+
 }
+
 
 def receiveMessages(client):
     while True:
-
         messageReceived = client.recv(1024).decode('utf-8')
         print(messageReceived)
         squareID, squareX, squareY = messageReceived.split("|")
@@ -25,7 +21,6 @@ def receiveMessages(client):
         squarePositions[squareID] = squarePos
 
         print(f"ID: {squareID} | Position: {squarePos}")
-
 
 
 def sendMessages(client):
@@ -38,9 +33,15 @@ def sendMessages(client):
         client.send(message)
         message = ""
 
+
 def play():
+    screenWidth = 1920
+    screenHeight = 1080
+    screen = pygame.display.set_mode([screenWidth, screenHeight])
+    clock = pygame.time.Clock()
     running = True
     while running:
+        pygame.time.delay(50)
         screen.fill([0, 0, 0])
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -52,6 +53,7 @@ def play():
 
         pygame.display.flip()
 
+
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((host, port))
 client.send(str(id).encode())
@@ -62,7 +64,6 @@ threadReceive.start()
 threadSend = threading.Thread(target=sendMessages, args=(client,))
 threadSend.start()
 
-threadPlay =threading.Thread(target=play)
+threadPlay = threading.Thread(target=play, args=())
 threadPlay.start()
-
 
