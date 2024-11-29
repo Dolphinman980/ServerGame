@@ -30,9 +30,11 @@ def receiveMessages(client):
 
 def sendMessages(client):
     while True:
-        pygame.time.delay(100)
+        pygame.time.delay(50)
         mousePos = pygame.mouse.get_pos()
+
         message = f"{id}|{mousePos[0]}|{mousePos[1]}".encode()
+        client.send(str(len(message)).encode())
         client.send(message)
         message = ""
 
