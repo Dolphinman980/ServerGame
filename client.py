@@ -3,7 +3,7 @@ import threading
 import pygame
 
 id = int(input("Choose an ID: "))
-host = '127.0.0.1'
+host = '10.1.1.51'
 port = 12345
 
 screenWidth = 1920
@@ -38,6 +38,19 @@ def sendMessages(client):
         client.send(message)
         message = ""
 
+def play():
+    running = True
+    while running:
+        screen.fill([0, 0, 0])
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+        for key in squarePositions:
+            print(key)
+            pygame.draw.circle(screen, [255, 255, 0], squarePositions[key], 10)
+
+        pygame.display.flip()
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((host, port))
@@ -49,16 +62,7 @@ threadReceive.start()
 threadSend = threading.Thread(target=sendMessages, args=(client,))
 threadSend.start()
 
-running = True
-while running:
-    screen.fill([0, 0, 0])
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-    for key in squarePositions:
-        print(key)
-        pygame.draw.circle(screen, [255, 255, 0], squarePositions[key], 10)
+threadPlay =threading.Thread(target=play)
+threadPlay.start()
 
 
-    pygame.display.flip()
