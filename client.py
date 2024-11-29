@@ -4,7 +4,8 @@ import pygame
 
 id = int(input("Choose an ID: "))
 host = '10.1.1.51'
-port = 12345
+port = 50000
+HEADER = 64
 
 squarePositions = {
 
@@ -15,23 +16,30 @@ def receiveMessages(client):
     while True:
         messageReceived = client.recv(1024).decode('utf-8')
         print(messageReceived)
-        squareID, squareX, squareY = messageReceived.split("|")
-        squarePos = (int(squareX), int(squareY))
+        try:
+            squareID, squareX, squareY = messageReceived.split("|")
+            squarePos = (int(squareX), int(squareY))
 
-        squarePositions[squareID] = squarePos
+            squarePositions[squareID] = squarePos
 
-        print(f"ID: {squareID} | Position: {squarePos}")
+            print(f"ID: {squareID} | Position: {squarePos}")
+        except:
+            pass
 
 
 def sendMessages(client):
     while True:
-        pygame.time.delay(50)
+        pygame.time.delay(16)
         mousePos = pygame.mouse.get_pos()
 
         message = f"{id}|{mousePos[0]}|{mousePos[1]}".encode()
-        client.send(str(len(message)).encode())
-        client.send(message)
-        message = ""
+        messageLength = f"{len(message):<{HEADER}}".encode()  # Pad to 64 bytes
+        try:
+            client.send(messageLength)  # Send padded length
+            client.send(message)  # Send the actual message
+        except ConnectionError:
+            print("Connection lost. Exiting...")
+            break
 
 
 def play():
@@ -66,4 +74,3 @@ threadSend.start()
 
 threadPlay = threading.Thread(target=play, args=())
 threadPlay.start()
-
