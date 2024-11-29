@@ -7,6 +7,8 @@ port = 12345
 clients = []
 aliases = []
 
+HEADER = 64
+
 def broadcast(message):
     for client in clients:
         client.send(message)
@@ -14,9 +16,10 @@ def broadcast(message):
 def handleClient(client):
     while True:
         try:
-            message = client.recv(1024)
+            messageLength = int(client.recv(HEADER))
+            message = client.recv(messageLength)
             broadcast(message)
-            print(message)
+
         except:
             index = clients.index(client)
             clients.remove(client)
